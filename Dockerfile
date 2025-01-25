@@ -4,9 +4,10 @@ LABEL maintainer="SynoCommunity <https://github.com/SynoCommunity/spksrc/graphs/
 LABEL url="https://synocommunity.com"
 LABEL vcs-url="https://github.com/SynoCommunity/spksrc"
 
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 
-# Manage i386 arch
+# Install required architectures (allowing dotnet sdks installation on arm64)
+RUN dpkg --add-architecture amd64
 RUN dpkg --add-architecture i386
 
 # Install required packages (in sync with README.rst instructions)
@@ -31,7 +32,6 @@ RUN apt update && apt install --no-install-recommends -y \
 	fakeroot \
 	flex \
 	gh \
-	g++-multilib \
 	gawk \
 	gettext \
 	git \
@@ -41,7 +41,8 @@ RUN apt update && apt install --no-install-recommends -y \
 	jq \
 	libtool-bin \
 	libbz2-dev \
-	libc6-i386 \
+	libc6 \
+	libstdc++6 \
 	libcppunit-dev \
 	libffi-dev \
 	libgc-dev \
@@ -78,6 +79,19 @@ RUN apt update && apt install --no-install-recommends -y \
 	yasm \
 	zip \
 	zlib1g-dev
+
+# Install prerequisites when executing on ARM
+RUN apt install --no-install-recommends -y \
+ 	libc6:amd64 \
+ 	libc6:i386 \
+ 	libicu72:amd64 \
+ 	libicu72:i386 \
+ 	libssl3:amd64 \
+ 	libssl3:i386 \
+ 	libstdc++6:amd64 \
+ 	libstdc++6:i386 \
+ 	zlib1g-dev:amd64 \
+ 	zlib1g-dev:i386 
 
 # Python based apps
 RUN apt install --no-install-recommends -y \
