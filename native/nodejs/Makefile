@@ -5,13 +5,26 @@ PKG_NAME = nodejs
 # v22 is LTS Version "Jod" from 2024-10-29 to 2025-10-21 with EOL at 2027-04-30
 PKG_VERS = 22.13.1
 PKG_EXT = tar.xz
-PKG_DIST_NAME = node-v$(PKG_VERS)-linux-x64.$(PKG_EXT)
+PKG_DIST_NAME = node-v$(PKG_VERS)-linux-$(PKG_DIST_ARCH).$(PKG_EXT)
 PKG_DIST_SITE = https://nodejs.org/dist/v$(PKG_VERS)
-PKG_DIR = node-v$(PKG_VERS)-linux-x64
+PKG_DIR = node-v$(PKG_VERS)-linux-$(PKG_DIST_ARCH)
 
 HOMEPAGE = https://nodejs.org/
 COMMENT  = JavaScript runtime built on Chrome's V8 JavaScript engine.
 LICENSE  = https://github.com/nodejs/node/blob/master/LICENSE
+
+# get native CPU arch
+EXECUTING_ARCH = $(shell uname -m)
+SUPPORTED_x64 = x86_64
+SUPPORTED_ARM64 = aarch64 arm64
+
+ifeq ($(findstring $(EXECUTING_ARCH), $(SUPPORTED_x64)),$(EXECUTING_ARCH))
+PKG_DIST_ARCH = x64
+else ifeq ($(findstring $(EXECUTING_ARCH), $(SUPPORTED_ARM64)),$(EXECUTING_ARCH))
+PKG_DIST_ARCH = arm64
+else
+$(error unsupported executing architecture [$(EXECUTING_ARCH)])
+endif
 
 INSTALL_TARGET = nodejs-install
 

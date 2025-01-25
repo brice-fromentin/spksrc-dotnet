@@ -1,7 +1,7 @@
 # Build dotnet programs
 #
 # prerequisites:
-# - cross/module depends on native/dotnet only
+# - cross/module depends apt installable dotnet SDKs
 # - module does not require kernel (REQUIRE_KERNEL)
 #
 # remarks:
@@ -35,6 +35,9 @@ ARCH_SUFFIX = -$(ARCH)-$(TCVERSION)
 TC = syno$(ARCH_SUFFIX)
 endif
 endif
+
+##### dotnet sdk installation
+#include ../../mk/spksrc.cross-dotnet-install.mk
 
 ##### dotnet specific configurations
 include ../../mk/spksrc.cross-dotnet-env.mk

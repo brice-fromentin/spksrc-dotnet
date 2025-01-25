@@ -37,35 +37,36 @@ If you can't find an answer, or if you want to open a package request, read [CON
 cd spksrc # Go to the cloned repository's root folder.
 
 # If running on Linux:
-docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it -v $(pwd):/spksrc -w /spksrc ghcr.io/synocommunity/spksrc /bin/bash
 
 # If running on macOS:
-docker run -it --platform=linux/amd64 -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
+docker run -it -v $(pwd):/spksrc -w /spksrc -e TAR_CMD="fakeroot tar" ghcr.io/synocommunity/spksrc /bin/bash
 ```
 5. From there, follow the instructions in the [Developers HOW TO].
 
 
 
 ### Virtual machine
-A virtual machine based on an 64-bit version of Debian 12 stable OS is recommended. Non-x86 architectures are not supported.
+A virtual machine based on an 64-bit version of Debian 12 stable OS is recommended. x86 & arm64 architectures are only supported.
 
 Install the requirements (in sync with `Dockerfile`):
 ```bash
-sudo dpkg --add-architecture i386 && sudo apt-get update
+sudo dpkg --add-architecture amd64 && dpkg --add-architecture i386 && sudo apt-get update
 sudo apt update
-sudo apt install autoconf-archive autogen automake autopoint bash \
-                 bash-completion bc bison build-essential check cmake \
-                 curl cython3 debootstrap ed expect fakeroot flex \
-                 g++-multilib gawk gettext gh git gperf httpie imagemagick \
-                 intltool jq libtool-bin libbz2-dev libc6-i386 libcppunit-dev libffi-dev \
-                 libgc-dev libgmp3-dev libltdl-dev libmount-dev libncurses-dev \
-                 libpcre3-dev libssl-dev libtool libunistring-dev lzip \
-                 man-db manpages-dev mercurial meson mlocate moreutils nasm \
-                 ninja-build patchelf php pkg-config python3 python3-distutils \
-                 python3-mako python3-pip python3-virtualenv python3-yaml \
-                 rename ripgrep ruby-mustache rsync scons subversion \
-                 swig texinfo time tree unzip xmlto yasm zip zlib1g-dev
+sudo apt install --no-install-recommends -y \
+	       autoconf-archive autogen automake autopoint bash bash-completion c bison build-essential check \
+	       cmake curl cython3 debootstrap ed expect fakeroot flex gh gawk gettext git gperf imagemagick \
+	       intltool jq libtool-bin libbz2-dev libc6 libstdc++6 libcppunit-dev libffi-dev libgc-dev libgmp3-dev \
+	       libltdl-dev libmount-dev libncurses-dev libpcre3-dev libssl-dev libtool libunistring-dev lzip man-db \
+	       manpages-dev mlocate moreutils nasm patchelf php pkg-config rename ripgrep rsync ruby-mustache scons \
+	       subversion sudo swig texinfo time tree unzip xmlto yasm zip zlib1g-dev
+sudo apt install --no-install-recommends -y \
+ 	       libc6:amd64 libc6:i386 libicu72:amd64 libicu72:i386 libssl3:amd64 libssl3:i386 libstdc++6:amd64 libstdc++6:i386
+sudo apt install --no-install-recommends -y \
+	       httpie mercurial meson ninja-build python3 python3-distutils python3-mako \
+	       python3-pip python3-virtualenv python3-yaml
 ```
+
 From there, follow the instructions in the [Developers HOW TO].
 
 * You may need to install some packages from testing like autoconf. Read about Apt-Pinning to know how to do that.

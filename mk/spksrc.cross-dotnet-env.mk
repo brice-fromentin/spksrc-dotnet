@@ -7,7 +7,7 @@
 UNSUPPORTED_ARCHS += $(PPC_ARCHS) $(ARMv5_ARCHS) $(i686_ARCHS) $(ARMv7L_ARCHS)
 
 DOTNET_OS = linux
-DOTNET_DEFAULT_VERSION = 3.1
+DOTNET_DEFAULT_VERSION = 8.0
 
 ifeq ($(strip $(DOTNET_VERSION)),)
 	DOTNET_VERSION = $(DOTNET_DEFAULT_VERSION)
@@ -43,13 +43,6 @@ ifeq ($(strip $(DOTNET_ROOT)),)
 	# dotnet sdk path
 	DOTNET_ROOT = $(WORK_DIR)/../../../native/dotnet-sdk-$(DOTNET_VERSION)/work-native
 endif
-
-ifeq ($(strip $(DOTNET_ROOT_X86)),)
-	# dotnet sdk-32bit path
-	DOTNET_ROOT_X86 = ""
-	# DOTNET_ROOT_X86 = $(WORK_DIR)/../../../native/dotnet-x86-sdk-$(DOTNET_VERSION)/work-native
-endif
-
 
 ifeq ($(strip $(NUGET_PACKAGES)),)
 	# cache nuget packages
@@ -92,7 +85,6 @@ DOTNET_BUILD_ARGS += $(DOTNET_BUILD_PROPERTIES)
 # https://github.com/dotnet/docs/blob/master/docs/core/tools/dotnet.md#environment-variables
 ENV += DOTNET_PACKAGE_NAME=$(DOTNET_PACKAGE_NAME)
 ENV += DOTNET_ROOT=$(DOTNET_ROOT)
-ENV += DOTNET_ROOT\(x86\)=$(DOTNET_ROOT_X86)
 ENV += NUGET_PACKAGES=$(NUGET_PACKAGES)
 ENV += PATH=$(DOTNET_ROOT)/:$$PATH
 ENV += DOTNET_ARCH=$(DOTNET_ARCH)

@@ -6,7 +6,7 @@ LABEL vcs-url="https://github.com/SynoCommunity/spksrc"
 
 ENV LANG=C.UTF-8
 
-# Install required architectures (allowing dotnet sdks installation on arm64)
+# Specify required architectures
 RUN dpkg --add-architecture amd64
 RUN dpkg --add-architecture i386
 
