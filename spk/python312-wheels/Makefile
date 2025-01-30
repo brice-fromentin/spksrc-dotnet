@@ -24,8 +24,9 @@ LICENSE  = PSF
 # Enable debug_info symgols
 #GCC_DEBUG_INFO := 1
 
-WHEELS  = src/requirements-crossenv.txt
-WHEELS += src/requirements-abi3.txt
+WHEELS  = src/requirements-abi3.txt
+WHEELS += src/requirements-crossenv.txt
+WHEELS += src/requirements-pure.txt
 
 include ../../mk/spksrc.common.mk
 
@@ -33,10 +34,12 @@ include ../../mk/spksrc.common.mk
 # Use OpenSSL path as defined by either
 # spksrc.wheel-env.mk or spksrc.python.mk
 ENV += BORG_OPENSSL_PREFIX="$(OPENSSL_STAGING_PREFIX)"
-ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
-ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBACL_PREFIX="$(STAGING_INSTALL_PREFIX)"
 ENV += BORG_LIBB2_PREFIX="$(STAGING_INSTALL_PREFIX)"
-DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/zstd cross/libb2 cross/fuse
+ENV += BORG_LIBLZ4_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBXXHASH_PREFIX="$(STAGING_INSTALL_PREFIX)"
+ENV += BORG_LIBZSTD_PREFIX="$(STAGING_INSTALL_PREFIX)"
+DEPENDS += cross/attr cross/acl cross/openssl3 cross/lz4 cross/libb2 cross/fuse cross/xxhash cross/zstd
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [borgbackup] -std=c11
 endif
@@ -86,23 +89,20 @@ DEPENDS += cross/mariadb-connector-c
 ENV += MYSQLCLIENT_CFLAGS="$(CFLAGS) -I$(STAGING_INSTALL_PREFIX)/include/mysql -I$(STAGING_INSTALL_PREFIX)/include/mariadb -I$(STAGING_INSTALL_PREFIX)/$(PYTHON_INC_DIR)"
 ENV += MYSQLCLIENT_LDFLAGS="$(LDFLAGS)"
 
-# [numpy] <= 1.21.6 (armv5)
-# [numpy] <= 1.22.4 (armv7l)
-# [numpy] <= 1.24.4 last working version with gcc-4.9
-# These versions are now unsupported using py312
-# [numpy] >= 1.25.0 requires c++17
+# [numpy]
 ifeq ($(call version_gt, $(TC_GCC), 5.0),1)
 WHEELS += src/requirements-crossenv-numpy.txt
 endif
 
+# [Pendulum]
+# Needs atomic to build
+# Serves as maturin type python-wheel.mk example
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+DEPENDS += cross/pendulum
+endif
+
 # [Pillow]
-DEPENDS += cross/freetype cross/libjpeg cross/zlib
-WHEELS_BUILD_ARGS += [Pillow]
-WHEELS_BUILD_ARGS += build_ext
-WHEELS_BUILD_ARGS += --disable-platform-guessing
-WHEELS_BUILD_ARGS += --enable-freetype
-WHEELS_BUILD_ARGS += --enable-jpeg
-WHEELS_BUILD_ARGS += --enable-zlib
+DEPENDS += cross/pillow
 
 # [pycares]
 DEPENDS += cross/c-ares
@@ -122,11 +122,8 @@ endif
 DEPENDS += cross/curl
 ENV += PYCURL_CURL_CONFIG=$(STAGING_INSTALL_PREFIX)/bin/curl-config
 
-# [pydantic_core]
-# Requires path to maturin from crossenv
-ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
-WHEELS_CFLAGS += [pydantic_core] -std=c11
-endif
+# [pydantic-core] 
+DEPENDS += cross/pydantic-core
 
 # [PyNaCl]
 DEPENDS += cross/libsodium
@@ -135,13 +132,22 @@ ENV += SODIUM_INSTALL=system
 # [PyYAML]
 DEPENDS += cross/libyaml
 
+# [rpds-py]
+# Version >= 0.22.3 requires rustc >= 1.80
+ifneq ($(findstring $(ARCH),$(ARMv7L_ARCHS)),$(ARCH))
+WHEELS += src/requirements-crossenv-rpds-py.txt
+endif
+
 # [ruamel.yaml.clib]
 ifeq ($(call version_lt, $(TC_GCC), 5.0),1)
 WHEELS_CFLAGS += [ruamel.yaml.clib] -std=c11
 endif
 
-# [rpds-py], [pydantic_core]
-# Requires path to maturin from crossenv
-ENV += PATH=$(WORK_DIR)/crossenv/build/bin:$(PATH)
+##
+## Addition of requirements files beyond spksrc.python.mk
+## will not be taken into consideration for processing
+## unless WHEELS has been previously populated. This is due to
+## the makefile analysis phase which discard ifeq instructions.
+##
 
 include ../../mk/spksrc.python.mk

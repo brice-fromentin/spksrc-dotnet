@@ -62,6 +62,7 @@ RUN apt update && apt install --no-install-recommends -y \
 	mlocate \
 	moreutils \
 	nasm \
+	p7zip \
 	patchelf \
 	php \
 	pkg-config \
