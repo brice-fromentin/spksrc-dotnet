@@ -15,7 +15,7 @@ SUPPORTED_x64 = x86_64
 SUPPORTED_ARM64 = aarch64 arm64
 
 ifeq ($(findstring $(EXECUTING_ARCH), $(SUPPORTED_x64)),$(EXECUTING_ARCH))
-PKG_DIST_ARCH = x64
+PKG_DIST_ARCH = amd64
 else ifeq ($(findstring $(EXECUTING_ARCH), $(SUPPORTED_ARM64)),$(EXECUTING_ARCH))
 PKG_DIST_ARCH = arm64
 else
@@ -26,3 +26,5 @@ endif
 INSTALL_TARGET = nop
 
 include ../../mk/spksrc.native-install.mk
+
+https://dl.google.com/go/go1.23.5.linux-amd64.tar.gz
